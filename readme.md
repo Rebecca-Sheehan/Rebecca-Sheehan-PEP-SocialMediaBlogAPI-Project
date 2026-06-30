@@ -1,4 +1,4 @@
-# Project: Social Media Blog API
+# Project: Social Media Blog API 
 
 ## Background
 
