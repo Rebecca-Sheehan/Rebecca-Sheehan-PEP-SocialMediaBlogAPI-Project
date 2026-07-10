@@ -17,11 +17,27 @@ public class AccountService {
         this.accountDAO = accountDAO;
     }
 
-    public Account createAccount(Account account) throws SQLException {
-        return accountDAO.createAccount(account);
+    public Account createAccount(Account account) {
+        try {
+            if (accountDAO.checkUsername(account) == false)
+                return null;
+            String textU = account.getUsername();
+            if (textU == null || textU.length() == 0)
+                return null;
+            String textP = account.getPassword();
+            if (textP == null || textP.length() < 4)
+                return null;
+            return accountDAO.createAccount(account);
+        } catch (SQLException e) {
+            return null;
+        }
     }
 
-   public Account verifyAccount(Account account) throws SQLException {
-        return accountDAO.verifyAccount(account);
+   public Account verifyAccount(Account account) {
+        try {
+            return accountDAO.verifyAccount(account);
+        } catch (SQLException e) {
+            return null;
+        }
     }
 }

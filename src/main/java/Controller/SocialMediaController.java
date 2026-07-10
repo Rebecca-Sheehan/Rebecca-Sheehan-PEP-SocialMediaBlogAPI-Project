@@ -32,11 +32,11 @@ public class SocialMediaController {
         app.post("/login", this::verifyAccountHandler);
         app.post("/messages", this::createMessageHandler);
         app.get("/messages", this::getAllMessagesHandler);
-        app.get("/messages/{messageId}", this::getMessageByIdHandler);
-        app.delete("/messages/{messageId}", this::deleteMessageHandler);
-        app.patch("/messages/{messageId}", this::updateMessageHandler);
-        app.get("/messages/account/{accountId}", this::getMessagesByAccountHandler);
-        app.start(8080);
+        app.get("/messages/{message_id}", this::getMessageByIdHandler);
+        app.delete("/messages/{message_id}", this::deleteMessageHandler);
+        app.patch("/messages/{message_id}", this::updateMessageHandler);
+        app.get("/accounts/{account_id}/messages", this::getMessagesByAccountHandler);
+        //app.start(8080); // The tests threw a java.lang.IllegalStateException because the server was started twice
         return app;
     } 
 
@@ -65,14 +65,17 @@ public class SocialMediaController {
     }
 
     // Handler to create a new message
-    private void createMessageHandler(Context context) throws JsonProcessingException {
+    private void createMessageHandler(Context context)  {
         ObjectMapper mapper = new ObjectMapper();
-        Message message = mapper.readValue(context.body(), Message.class);
-        Message createdMessage = messageService.createMessage(message);
-        if (createdMessage != null) {
-            context.json(mapper.writeValueAsString(createdMessage)).status(200);
-        } else {
-            context.status(400);
+        try {
+            Message message = mapper.readValue(context.body(), Message.class);
+            Message createdMessage = messageService.createMessage(message);
+            if (createdMessage != null)
+                context.json(createdMessage).status(200);
+            else
+                context.status(400);
+        } catch (JsonProcessingException e) {
+                context.status(400);
         }
     }
 
@@ -88,6 +91,8 @@ public class SocialMediaController {
         Message message = messageService.getMessageById(message_id);
         if (message != null) 
             context.json(message).status(200);
+        if (message == null)
+            context.status(200);
     }
 
     // Handler to delete a message by its ID
@@ -96,6 +101,8 @@ public class SocialMediaController {
         Message deletedMessage = messageService.deleteMessage(message_id);
         if (deletedMessage != null) 
             context.json(deletedMessage).status(200);
+        if (deletedMessage == null)
+            context.status(200);
     }
 
     // Handler to update a message by its ID
@@ -113,7 +120,7 @@ public class SocialMediaController {
 
     // Handler to get messages by account
     private void getMessagesByAccountHandler(Context context) {
-        int posted_by = Integer.parseInt(context.pathParam("posted_by"));
+        int posted_by = Integer.parseInt(context.pathParam("account_id"));
         List<Message> messages = messageService.getMessagesByAccount(posted_by);
         context.json(messages).status(200);
     }

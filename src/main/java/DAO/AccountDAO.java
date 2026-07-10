@@ -6,13 +6,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 // How do I handle exceptions in the DAO layer? Do I throw them to the service layer or handle them here?
 
-// I still need to restrict the inputs for Account.
-    // The username must be greater than 0 characters
-    // The password must be greater than or equal to 4 characters
-    // The username cannot already exist in the Account table.
+// I need to fix this to return the account with the generated ID, but for now, it returns the account as is.
+
 
 public class AccountDAO {
     
@@ -20,11 +19,16 @@ public class AccountDAO {
     public Account createAccount(Account account) throws SQLException {
         Connection connection = ConnectionUtil.getConnection();
         String sql = "INSERT INTO Account (username, password) VALUES (?, ?);";
-        PreparedStatement ps = connection.prepareStatement(sql);
+        PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
         ps.setString(1, account.getUsername());
         ps.setString(2, account.getPassword());
         ps.executeUpdate();
-        return account; // I need to fix this to return the account with the generated ID, but for now, it returns the account as is.
+        ResultSet rs = ps.getGeneratedKeys();
+        if (rs.next()) {
+            int generatedId = rs.getInt(1);
+            account.setAccount_id(generatedId);
+        }
+        return account; 
     }
 
     // Method to verify if an account exists in the database
@@ -36,11 +40,25 @@ public class AccountDAO {
         ps.setString(2, account.getPassword());
         ResultSet rs = ps.executeQuery();
         if (rs.next()) {
-            return new Account(rs.getInt("account_id"), rs.getString("username"), rs.getString("password"));
+            return new Account(
+                rs.getInt("account_id"), 
+                rs.getString("username"), 
+                rs.getString("password"));
         }
-        return null; // Check the 'return new Account' logic later.
+        return null;
     }
 
-
-
+    // Method to check if a username is available
+    public boolean checkUsername(Account account) throws SQLException {
+        Connection connection = ConnectionUtil.getConnection();
+        String sql = "SELECT COUNT(username) FROM Account WHERE username = ?;";
+        PreparedStatement ps = connection.prepareStatement(sql);
+        ps.setString(1, account.getUsername());
+        ResultSet rs = ps.executeQuery();
+        rs.next();
+        int count = rs.getInt(1);
+        if (count == 0)
+            return true;
+        return false;
+    }
 }
