@@ -10,11 +10,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-
-// How do I handle exceptions in the DAO layer? Do I throw them to the service layer or handle them here?
-
 public class MessageDAO {
-
+    
     // Method to create a new message 
     public Message createMessage(Message message) throws SQLException {
         Connection connection = ConnectionUtil.getConnection();
@@ -30,7 +27,6 @@ public class MessageDAO {
             message.setMessage_id(generatedId);
         }
         return message;
-
     }
 
     // Method to get all messages

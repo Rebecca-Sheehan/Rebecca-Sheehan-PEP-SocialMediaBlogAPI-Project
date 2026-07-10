@@ -4,8 +4,6 @@ import Model.Account;
 import DAO.AccountDAO;
 import java.sql.SQLException;
 
-// How do I handle exceptions in the service layer? If I throw them to the controller layer, how do I handle them there?
-
 public class AccountService {
     public AccountDAO accountDAO;
 

@@ -5,8 +5,6 @@ import DAO.MessageDAO;
 import java.sql.SQLException;
 import java.util.List;
 
-// How do I handle exceptions in the service layer? If I throw them to the controller layer, how do I handle them there?
-
 public class MessageService {
     public MessageDAO messageDAO;
 

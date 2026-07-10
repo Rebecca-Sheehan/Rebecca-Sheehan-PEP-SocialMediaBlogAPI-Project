@@ -8,11 +8,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-// How do I handle exceptions in the DAO layer? Do I throw them to the service layer or handle them here?
-
-// I need to fix this to return the account with the generated ID, but for now, it returns the account as is.
-
-
 public class AccountDAO {
     
     // Method to create a new account into the database
